@@ -5,4 +5,4 @@ from data extracted from our Master spreadsheet using vanilla Python 3.
 
 We will try to keep the catalog page synced here.
 
-[] TODO: set up Github Actions so the catalog gets rebuilt on every successful push.
+- [ ] TODO: set up Github Actions so the catalog gets rebuilt on every successful push.
