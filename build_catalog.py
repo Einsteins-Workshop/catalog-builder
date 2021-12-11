@@ -157,19 +157,25 @@ def build_catalog(tsv_sourcefile, html_destination, prod=False):
         with open(tsv_sourcefile, 'r', newline='') as sourcedata:
             reader = csv.reader(sourcedata, delimiter='\t')
 
+            header_line = True
             for row in reader:
+                if header_line:
+                    header_line = False
+                    continue
                 category_long_name, *rest = row
                 category = category_map[category_long_name]
-                if category not in classes_by_category:
-                    classes_by_category[category] = []
-                classes_by_category[category].append(rest)
+                if row[-1] == 'Yes':
+                    if category not in classes_by_category:
+                        classes_by_category[category] = []
+                    classes_by_category[category].append(rest)
 
         for category in category_order:
             catalog.write(section_headings[category])
 
-            for class_info in classes_by_category[category]:
-                title, description, picture, _min_grade, _max_grade, _camp_or_class, _season, web_anchor, \
-                    _former_title, _link, catalog_expand, *_rest = class_info
+            for i, class_info in enumerate(classes_by_category[category]):
+                title, description, picture, _min_grade, _max_grade, _camp_or_class, _season, \
+                        web_anchor, *_rest = class_info
+                catalog_expand = f'{category}{i}'
                 catalog.write(f'''
 
 <div id="{web_anchor}" class="entry">
@@ -180,14 +186,16 @@ def build_catalog(tsv_sourcefile, html_destination, prod=False):
 <div class="w3-row">
 <div class="w3-threequarter description">
 <p>{description}</p>
-</div>
+</div>''' + (f'''
 <div class="w3-quarter">
 <img class="img2" alt="" src="{urlparse(picture).path}">
 </div>
+''' if len(picture) > 0 else '') + '''
 </div>
 <hr />
 </div>
 </div>''')
+
             catalog.write('''
 </div>
 </div>
